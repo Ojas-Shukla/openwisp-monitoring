@@ -38,6 +38,23 @@ class TestDashboardTimeseriesView(
     org2_id = str(uuid.uuid4())
     org3_id = str(uuid.uuid4())
 
+    def test_dashboard_parameters_are_available_in_browsable_api(self):
+        self.client.force_login(self._create_admin())
+        path = reverse("monitoring_general:api_dashboard_timeseries")
+
+        response = self.client.get(path, HTTP_ACCEPT="text/html")
+
+        self.assertEqual(response.status_code, 200)
+        for parameter in (
+            "organization_slug",
+            "location_id",
+            "floorplan_id",
+            "time",
+            "start",
+            "end",
+        ):
+            self.assertContains(response, f'name="{parameter}"')
+
     def _test_response_data(self, response):
         self.assertIn("x", response.data)
         charts = response.data["charts"]

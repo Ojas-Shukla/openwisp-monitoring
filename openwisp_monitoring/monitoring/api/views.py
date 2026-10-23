@@ -1,8 +1,8 @@
 from cache_memoize import cache_memoize
 from django.db.models import Q
 from rest_framework.exceptions import NotFound, PermissionDenied
+from rest_framework.generics import GenericAPIView
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
 from swapper import load_model
 
 from openwisp_users.api.mixins import ProtectedAPIMixin
@@ -10,6 +10,7 @@ from openwisp_users.api.mixins import ProtectedAPIMixin
 from ...settings import CACHE_TIMEOUT
 from ...views import MonitoringApiViewMixin
 from ..configuration import DEFAULT_DASHBOARD_TRAFFIC_CHART
+from .filters import DashboardQueryFilterBackend, DashboardQueryFilterSet
 
 Chart = load_model("monitoring", "Chart")
 Metric = load_model("monitoring", "Metric")
@@ -18,13 +19,18 @@ Location = load_model("geo", "Location")
 FloorPlan = load_model("geo", "FloorPlan")
 
 
-class DashboardTimeseriesView(ProtectedAPIMixin, MonitoringApiViewMixin, APIView):
+class DashboardTimeseriesView(
+    ProtectedAPIMixin, MonitoringApiViewMixin, GenericAPIView
+):
     """Multi-tenant view that returns general monitoring charts for the admin dashboard.
 
     Allows filtering with organization slugs.
     """
 
     permission_classes = [IsAuthenticated]
+    queryset = Chart.objects.none()
+    filter_backends = [DashboardQueryFilterBackend]
+    filterset_class = DashboardQueryFilterSet
 
     def _get_organizations(self):
         query_orgs = self.request.query_params.get("organization_slug", "")

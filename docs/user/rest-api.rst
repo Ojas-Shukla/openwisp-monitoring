@@ -70,6 +70,16 @@ multi-tenancy and allows filtering monitoring data by
 
     GET /api/v1/monitoring/dashboard/?organization_slug=<org1-slug>,<org2-slug>&location_id=<location1-id>,<location2-id>&floorplan_id=<floorplan1-id>,<floorplan2-id>
 
+- The browsable API displays these query parameters, as well as ``time``,
+  ``start`` and ``end``:
+
+  - ``organization_slug``: one or more comma-separated organization slugs
+  - ``location_id``: one or more comma-separated location IDs
+  - ``floorplan_id``: one or more comma-separated floor plan IDs
+  - ``time``: timeframe in days, such as ``3d`` for the last 3 days
+  - ``start`` and ``end``: optional custom range in ``YYYY-MM-DD H:M:S``
+    format; provide both to use a custom range instead of ``time``
+
 - When retrieving chart data, the ``time`` parameter allows to specify the
   time frame, e.g.:
 
